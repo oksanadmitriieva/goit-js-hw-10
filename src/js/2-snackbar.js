@@ -1,55 +1,55 @@
-'use strict';
 
 import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
-import success from '../img/iconmonstr-check-mark-14.svg';
-import error from '../img/iconmonstr-error-8.svg';
 
-const popupHandler = (delay, state) => {
-  const promise = new Promise((res, rej) => {
-    setTimeout(() => {
-      if (state === 'fulfilled') {
-        res(`Fulfilled promise in ${delay}ms`);
-      } else {
-        rej(`Rejected promise in ${delay}ms`);
-      }
-    }, delay);
-  });
-  promise
-    .then(res => {
-      iziToast.success({
-        class: 'popup-message',
-        theme: 'dark',
-        backgroundColor: '#7fffd4',
-        messageColor: '#fff',
-        iconUrl: success,
+
+const form = document.querySelector('.form');
+
+
+form.addEventListener('submit', handleCreate);
+
+
+function handleCreate(event) {
+  event.preventDefault();
+
+  const dataDelay = event.target.elements.delay.value;
+  const ratioBnt = event.target.elements.state.value;
+
+  function createNotification(dataDelay) {
+    return new Promise((res, rej) => {
+      const delay = Number(dataDelay);
+      setTimeout(() => {
+        if (ratioBnt === 'fulfilled') {
+          res(delay);
+        } else {
+          rej(delay);
+        }
+      }, delay);
+    });
+  }
+
+ 
+  createNotification(dataDelay)
+    .then(value => {
+   
+      iziToast.show({
+        message: `✅ Обещание выполнено за ${dataDelay} мс`,
+        messageColor: '#ffffff',
+        color: '#65B741',
         position: 'topRight',
-        pauseOnHover: true,
-        timeout: 3000,
-        message: res,
+        progressBarColor: '#ffffff',
+        close: false,
       });
     })
-    .catch(rej => {
-      iziToast.error({
-        class: 'popup-message',
-        theme: 'dark',
-        backgroundColor: '#ef4040',
-        messageColor: '#fff',
-        iconUrl: error,
+    .catch(error => {
+      
+      iziToast.show({
+        message: `❌ Обещание отклонено за ${dataDelay} мс`,
+        messageColor: '#ffffff',
+        color: '#FF6868',
         position: 'topRight',
-        pauseOnHover: true,
-        timeout: 3000,
-        message: rej,
+        progressBarColor: '#ffffff',
+        close: false,
       });
     });
-};
-
-const initForm = () => {
-  const form = document.querySelector('.form');
-  form.addEventListener('submit', evt => {
-    evt.preventDefault();
-    popupHandler(form.delay.value, form.state.value);
-  });
-};
-
-initForm();
+}

@@ -2,54 +2,38 @@
 import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
 
-
 const form = document.querySelector('.form');
 
+form.addEventListener('submit', createPromise);
 
-form.addEventListener('submit', handleCreate);
-
-
-function handleCreate(event) {
+function createPromise(event) {
   event.preventDefault();
+  let delay = form.elements.delay.value;
+  let state = form.elements.state.value;
 
-  const dataDelay = event.target.elements.delay.value;
-  const ratioBnt = event.target.elements.state.value;
+  const promise = new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (state === 'fulfilled') {
+        resolve(`✅ Fulfilled promise in ${delay}ms`);
+      } else {
+        reject(`❌ Rejected promise in ${delay}ms`);
+      }
+    }, delay);
+  });
 
-  function createNotification(dataDelay) {
-    return new Promise((res, rej) => {
-      const delay = Number(dataDelay);
-      setTimeout(() => {
-        if (ratioBnt === 'fulfilled') {
-          res(delay);
-        } else {
-          rej(delay);
-        }
-      }, delay);
-    });
-  }
-
- 
-  createNotification(dataDelay)
-    .then(value => {
-   
-      iziToast.show({
-        message: `✅ Обещание выполнено за ${dataDelay} мс`,
-        messageColor: '#ffffff',
-        color: '#65B741',
+  promise
+    .then(result => {
+      iziToast.success({
         position: 'topRight',
-        progressBarColor: '#ffffff',
-        close: false,
+        message: result,
       });
     })
     .catch(error => {
-      
-      iziToast.show({
-        message: `❌ Обещание отклонено за ${dataDelay} мс`,
-        messageColor: '#ffffff',
-        color: '#FF6868',
+      iziToast.error({
         position: 'topRight',
-        progressBarColor: '#ffffff',
-        close: false,
+        message: error,
       });
     });
+
+  form.reset();
 }
